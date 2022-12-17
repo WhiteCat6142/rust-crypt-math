@@ -80,5 +80,5 @@ fn main() {
     let x = GF::new(3u128);
     let y = GF::new(3u128);
     let GF(i) = x * y;
-    println!("format {} arguments", i);
+    println!("(x+1)^2 = x^2+1 = {}", i);
 }

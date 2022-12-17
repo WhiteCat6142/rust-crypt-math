@@ -28,11 +28,16 @@ fn prime(n: &BigUint) -> bool {
     // must be s>0 because n is odd
     let s: u64 = d0.trailing_zeros().unwrap();
     let d: BigUint = d0.clone() >> s;
-    for _ in 0..19 {
+    let zero = BigUint::from(0u64);
+    let one = BigUint::from(1u64);
+    for _ in 0..190 {
         let a = rng.gen_biguint_below(&d0);
-        let mut y = a.modpow(&d, &n);
+        if a==zero{
+            continue;
+        }
+        let mut y = a.clone().modpow(&d, &n);
         let mut i = s;
-        if y == BigUint::from(1u64) {
+        if y == one {
             continue;
         }
         while y != d0 {
@@ -46,7 +51,12 @@ fn prime(n: &BigUint) -> bool {
     return true;
 }
 
-fn gcd_extended(a: i64, b: i64) -> (i64, i64, i64) {
+/*
+Rustのconst fnの制限がさらに緩和された(Rust 1.46.0) - Qiita
+https://qiita.com/block/items/de9ecbb4d102eaa35ac8
+*/
+
+const fn gcd_extended(a: i64, b: i64) -> (i64, i64, i64) {
     if a == 0 {
         return (b, 0, 1);
     }
@@ -57,14 +67,17 @@ fn gcd_extended(a: i64, b: i64) -> (i64, i64, i64) {
 }
 
 fn main() {
-    let (a, b) = (35, 15);
-    let (g, x, y) = gcd_extended(a, b);
+    const A :i64= 35;
+    const B :i64=15;
+    const X :(i64, i64, i64)= gcd_extended(A, B);
+    let (g, x, y) = X;
     let t = prime(&BigUint::from(101u64));
     let (v, w) = gen_key(24);
-    println!("gcd({},{}) = {}, {}, {} {}", a, b, g, x, y, t);
     let m = decrypt(encrypt(BigUint::from(30531u64), &v, 65537u64), &w, &v);
-    println!("{}", m);
-    println!("{}{}", v, w);
+    println!("gcd({},{}) = {}, {}, {}", A, B, g, x, y);  
+    println!("101 is prime: {}", t);
+    println!("message {}", m);
+    println!("{},{}", v, w);
 }
 
 /*
@@ -103,11 +116,10 @@ fn gen_key(k: u64) -> (BigUint, BigUint) {
     if gcd != 1 {
         return gen_key(k);
     }
-    println!("{}", x);
     let d = if x > 0 {
-        l.clone() - (l / e) * (x.to_u64().unwrap()) - (-y).to_u64().unwrap()
+        l.clone() - (l / e) * (x as u64) - ((-y) as u64)
     } else {
-        (l / e) * ((-x).to_u64().unwrap()) + y.to_u64().unwrap()
+        (l / e) * ((-x) as u64) + (y as u64)
     };
     return (n, d);
 }
