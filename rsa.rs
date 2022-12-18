@@ -30,12 +30,12 @@ fn prime(n: &BigUint) -> bool {
     let d: BigUint = d0.clone() >> s;
     let zero = BigUint::from(0u64);
     let one = BigUint::from(1u64);
-    for _ in 0..190 {
+    for _ in 0..60 {
         let a = rng.gen_biguint_below(&d0);
-        if a==zero{
+        if a == zero {
             continue;
         }
-        let mut y = a.clone().modpow(&d, &n);
+        let mut y = a.modpow(&d, &n);
         let mut i = s;
         if y == one {
             continue;
@@ -60,21 +60,21 @@ const fn gcd_extended(a: i64, b: i64) -> (i64, i64, i64) {
     if a == 0 {
         return (b, 0, 1);
     }
-    let (gcd, x1, y1) = gcd_extended(b % a, a);
-    let x = y1 - (b / a) * x1;
+    let (gcd, x1, y1) = gcd_extended(b%a, a);
+    let x = y1 - (b/a) * x1;
     let y = x1;
     return (gcd, x, y);
 }
 
 fn main() {
-    const A :i64= 35;
-    const B :i64=15;
-    const X :(i64, i64, i64)= gcd_extended(A, B);
+    const A: i64 = 35;
+    const B: i64 = 15;
+    const X: (i64, i64, i64) = gcd_extended(A, B);
     let (g, x, y) = X;
     let t = prime(&BigUint::from(101u64));
     let (v, w) = gen_key(24);
     let m = decrypt(encrypt(BigUint::from(30531u64), &v, 65537u64), &w, &v);
-    println!("gcd({},{}) = {}, {}, {}", A, B, g, x, y);  
+    println!("gcd({},{}) = {}, {}, {}", A, B, g, x, y);
     println!("101 is prime: {}", t);
     println!("message {}", m);
     println!("{},{}", v, w);

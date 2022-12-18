@@ -7,6 +7,8 @@ edition = "2021"
 name = "rsa"
 [[bin]]
 name = "gf-gcm"
+[[bin]]
+name = "ploy1305"
 
 [dependencies]
 num-bigint = { version = "0.4.3", features = ["rand"] }

@@ -1,6 +1,7 @@
 #!/bin/bash
 mkdir -p ./src/bin 
 cp ./*.rs ./src/bin
-cargo build
-cargo run --bin gf-gcm
-cargo run --bin rsa
+cargo build --release
+cargo run --bin gf-gcm -r
+cargo run --bin rsa -r
+cargo run --bin ploy1305 -r
