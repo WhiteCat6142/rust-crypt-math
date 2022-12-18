@@ -63,13 +63,9 @@ unsafe fn mul_mod1305(a: u64, b: u64, p: u64, x: u64, y: u64) -> (u64, u64, u64)
 
     let w21 = z23 & 3u64 + (d11 as u64) + (d12 as u64);
 
-    //overflow once at most
-    if w21 & 4u64 != 0u64 {
-        let (w31, d31) = w21.overflowing_add(5u64);
-        return (w02 & 3u64, w12 + (d31 as u64), w31);
-    } else {
-        return (w02, w12, w21);
-    }
+    //w12 overflow once at most
+    let (w31, d31) = w02.overflowing_add([0u64, 5u64][((w21 >> 2) & 1) as usize]);
+    return (w31, w12 + (d31 as u64), w21 & 3u64);
 }
 
 fn clamp(r0: &mut u64, r1: &mut u64) -> () {
@@ -99,12 +95,11 @@ fn add(x0: u64, x1: u64, x2: u64, bytes: [u8; 16], p: u64) -> (u64, u64, u64) {
     let (mut x11, mut c11) = x1.carrying_add(b, c01);
     let mut x21 = x2 + p + (c11 as u64);
 
-    if x21 & 4u64 != 0u64 {
-        (x01, c01) = x01.overflowing_add(5u64);
-        (x11, c11) = x11.overflowing_add(c01 as u64);
-        x21 &= 3u64;
-        x21 += c11 as u64;
-    }
+    (x01, c01) = x01.overflowing_add([0u64, 5u64][((x21 >> 2) & 1) as usize]);
+    (x11, c11) = x11.overflowing_add(c01 as u64);
+    x21 &= 3u64;
+    x21 += c11 as u64;
+
     return (x01, x11, x21);
 }
 
